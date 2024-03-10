@@ -29,5 +29,6 @@ func createEvent(context *gin.Context) {
 		context.JSON(http.StatusBadRequest, gin.H{"message": "Could not parse request data"})
 		return
 	}
+	// gin.H is an alias for map[string]any
 	context.JSON(http.StatusCreated, gin.H{"message": "Event Created", "event": event})
 }

@@ -3,11 +3,11 @@ package models
 import "time"
 
 type Event struct {
-	ID          int    `binding:"required"`
+	ID          int
 	Name        string `binding:"required"`
 	Description string
-	Location    string `binding:"required"`
-	DateTime    time.Time
+	Location    string    `binding:"required"`
+	DateTime    time.Time `binding:"required"`
 	UserID      int
 }
 
