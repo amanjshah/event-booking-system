@@ -5,19 +5,22 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+var DB *sql.DB
+
 func InitDB() {
-	DB, err := sql.Open("sqlite3", "api.db")
+	db, err := sql.Open("sqlite3", "api.db")
 	if err != nil {
 		panic("Could not connect to database. ")
 	}
 
+	DB = db
 	DB.SetMaxOpenConns(10)
 	DB.SetMaxIdleConns(5)
 
-	createTables(DB)
+	createTables()
 }
 
-func createTables(DB *sql.DB) {
+func createTables() {
 	createEventsTable := `
 	CREATE TABLE IF NOT EXISTS events (
 	    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
