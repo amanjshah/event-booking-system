@@ -14,20 +14,18 @@ type Event struct {
 	UserID      int
 }
 
-// Save in-memory til db is introduced
-var events = []Event{}
-
 func (e Event) Save() error {
 	// Note to self: always execute such queries like this (inject values via Exec method rather than adding values into the query string manually).
 	// Protects against SQL injection attacks.
 	query := `
-	INSERT INTO events(name, description, location, dateTime, user_id) 
+	INSERT INTO events(event_name, description, location, dateTime, user_id) 
 	VALUES(?,?,?,?,?)
 	`
 	statement, err := db.DB.Prepare(query)
 	if err != nil {
 		return err
 	}
+
 	defer statement.Close()
 	result, err := statement.Exec(e.Name, e.Description, e.Location, e.DateTime, e.UserID)
 	if err != nil {
@@ -38,6 +36,24 @@ func (e Event) Save() error {
 	return err
 }
 
-func GetAllEvents() []Event {
-	return events
+func GetAllEvents() ([]Event, error) {
+	query := "SELECT * FROM events"
+	// Use Query when you want to query data, and Exec when you want to insert/update data.
+	rows, err := db.DB.Query(query)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+	var events []Event
+	// loop until there are no more rows
+	for rows.Next() {
+		var event Event
+		err := rows.Scan(&event.ID, &event.Name, &event.Description, &event.Location, &event.DateTime, &event.UserID)
+		if err != nil {
+			return nil, err
+		}
+		events = append(events, event)
+	}
+	return events, nil
 }
