@@ -2,15 +2,13 @@ package models
 
 import (
 	"github.com/amanjshah/event-booking-system/db"
-	"time"
 )
 
 type Event struct {
 	ID          int64
-	Name        string    `binding:"required"`
-	Description string    `binding:"required"`
-	Location    string    `binding:"required"`
-	DateTime    time.Time `binding:"required"`
+	Name        string `binding:"required"`
+	Description string `binding:"required"`
+	Location    string `binding:"required"`
 	UserID      int
 }
 
@@ -18,8 +16,8 @@ func (e Event) Save() error {
 	// Note to self: always execute such queries like this (inject values via Exec method rather than adding values into the query string manually).
 	// Protects against SQL injection attacks.
 	query := `
-	INSERT INTO events(event_name, description, location, dateTime, user_id) 
-	VALUES(?,?,?,?,?)
+	INSERT INTO events(event_name, description, location, user_id) 
+	VALUES(?,?,?,?)
 	`
 	statement, err := db.DB.Prepare(query)
 	if err != nil {
@@ -27,7 +25,7 @@ func (e Event) Save() error {
 	}
 
 	defer statement.Close()
-	result, err := statement.Exec(e.Name, e.Description, e.Location, e.DateTime, e.UserID)
+	result, err := statement.Exec(e.Name, e.Description, e.Location, e.UserID)
 	if err != nil {
 		return err
 	}
@@ -49,7 +47,7 @@ func GetAllEvents() ([]Event, error) {
 	// loop until there are no more rows
 	for rows.Next() {
 		var event Event
-		err := rows.Scan(&event.ID, &event.Name, &event.Description, &event.Location, &event.DateTime, &event.UserID)
+		err := rows.Scan(&event.ID, &event.Name, &event.Description, &event.Location, &event.UserID)
 		if err != nil {
 			return nil, err
 		}

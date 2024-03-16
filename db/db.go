@@ -27,7 +27,6 @@ func createTables() {
 	    "event_name" TEXT NOT NULL,
 		"description" TEXT NOT NULL,
 	 	"location" TEXT NOT NULL,
-	    "dataTime" DATETIME NOT NULL,
 	    "user_id" INTEGER
 	);`
 
