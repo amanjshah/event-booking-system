@@ -2,7 +2,6 @@ package routes
 
 import (
 	"github.com/amanjshah/event-booking-system/models"
-	"github.com/amanjshah/event-booking-system/utils"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
@@ -35,26 +34,15 @@ func getEvent(context *gin.Context) {
 }
 
 func createEvent(context *gin.Context) {
-	token := context.Request.Header.Get("Authorization")
-	if token == "" {
-		context.JSON(http.StatusUnauthorized, gin.H{"message": "Authorization is required. "})
-		return
-	}
-	userId, err := utils.VerifyToken(token)
-	if err != nil {
-		context.JSON(http.StatusUnauthorized, gin.H{"message": "Not authorized. "})
-		return
-	}
-
 	var event models.Event
 	// ShouldBindJson binds the request body to a pointer input var.
-	err = context.ShouldBindJSON(&event)
+	err := context.ShouldBindJSON(&event)
 	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"message": "Could not parse request data."})
 		return
 	}
 
-	event.UserID = userId
+	event.UserID = context.GetInt64("userId")
 
 	err = event.Save()
 	if err != nil {
