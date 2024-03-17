@@ -53,3 +53,16 @@ func (u *User) Validate() error {
 	}
 	return nil
 }
+
+func (u *User) getEmailFromId() (string, error) {
+	query := "SELECT email FROM users WHERE id = ?"
+	row := db.DB.QueryRow(query, u.ID)
+
+	var email string
+	err := row.Scan(&email)
+	if err != nil {
+		return "", errors.New("Invalid email. ")
+	}
+
+	return email, nil
+}

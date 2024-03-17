@@ -46,3 +46,21 @@ func cancelRegistration(context *gin.Context) {
 
 	context.JSON(http.StatusOK, gin.H{"message": "Registration cancelled! "})
 }
+
+func getRegistrationsForEvent(context *gin.Context) {
+	eventId, err := strconv.ParseInt(context.Param("eventId"), 10, 64)
+	if err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"message": "Could not parse event id."})
+		return
+	}
+
+	var event models.Event
+	event.ID = eventId
+	emails, err := event.ListRegisteredEmails()
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to list registrations. "})
+		return
+	}
+
+	context.JSON(http.StatusOK, emails)
+}

@@ -1,6 +1,7 @@
 package models
 
 import (
+	"errors"
 	"github.com/amanjshah/event-booking-system/db"
 )
 
@@ -121,4 +122,33 @@ func (e Event) CancelRegistration(userId int64) error {
 	defer statement.Close()
 	_, err = statement.Exec(e.ID, userId)
 	return err
+}
+
+func (e Event) ListRegisteredEmails() ([]string, error) {
+	query := "SELECT user_id FROM registrations WHERE event_id = ?"
+
+	rows, err := db.DB.Query(query, e.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+	var emails []string
+	// loop until there are no more rows
+	for rows.Next() {
+		var userId int64
+		err := rows.Scan(&userId)
+		if err != nil {
+			return nil, err
+		}
+		var user User
+		user.ID = userId
+		email, err := user.getEmailFromId()
+		if err != nil {
+			return nil, errors.New("Failed to fetch user email. ")
+		}
+		emails = append(emails, email)
+	}
+
+	return emails, nil
 }
