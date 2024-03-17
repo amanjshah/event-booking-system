@@ -12,7 +12,7 @@ type Event struct {
 	UserID      int64
 }
 
-func (e Event) Save() error {
+func (e *Event) Save() error {
 	// Note to self: always execute such queries like this (inject values via Exec method rather than adding values into the query string manually).
 	// Protects against SQL injection attacks.
 	query := `

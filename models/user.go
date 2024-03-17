@@ -12,7 +12,7 @@ type User struct {
 	Password string `binding:"required"`
 }
 
-func (u User) Save() error {
+func (u *User) Save() error {
 	query := "INSERT INTO users(email, password) VALUES (?, ?)"
 	statement, err := db.DB.Prepare(query)
 	if err != nil {
@@ -35,16 +35,18 @@ func (u User) Save() error {
 	return err
 }
 
-func (u User) Validate() error {
-	query := "SELECT password FROM users WHERE email = ?"
+func (u *User) Validate() error {
+	query := "SELECT id, password FROM users WHERE email = ?"
 	row := db.DB.QueryRow(query, u.Email)
 
+	var id int64
 	var password string
-	err := row.Scan(&password)
+	err := row.Scan(&id, &password)
 	if err != nil {
 		return errors.New("Invalid credentials. ")
 	}
 
+	u.ID = id
 	// Validate that real password is equivalent to the password sent in the request
 	if !utils.CheckPassword(password, u.Password) {
 		return errors.New("Invalid credentials. ")
